@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Kabuk": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\cozor\\Documents\\TestBench\\KB\\Tst1\\main.kbk",
+      "remoteDebugEnabled": false
+    }
+  }
+}
