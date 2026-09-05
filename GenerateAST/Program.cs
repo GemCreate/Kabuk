@@ -1,91 +1,105 @@
 ﻿// AST generation tool for the Kabuk programming language.
 // This tool generates the abstract syntax tree (AST) classes based on the provided definitions.
 
+namespace GenerateAST;
 
-namespace GenerateAST
+internal class Program
 {
-    internal class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        if (args.Length > 1)
         {
-            if (args.Length != 0)
-            { // Check if the number of command line arguments is not equal to 0
-                Console.Error.WriteLine("Usage: generate_ast <output directory>"); // Print an error message to the console if the number of arguments is not equal to 0
-                Environment.Exit(64); // Exit code 64 indicates a command line usage error
-                // 
-
-            }
-            string outputDir = args[0]; // Get the output directory from the command line arguments
+            Console.Error.WriteLine("Usage: generate_ast [output directory]");
+            Environment.Exit(64); // Command line usage error
         }
 
-        private static void defineAst(string outputDir, string baseName, List<string> types)
-        { // Define the AST classes based on the provided base name and types
+        // Use the given directory, or fall back to the current directory.
+        string outputDir = args.Length == 1 ? args[0] : Directory.GetCurrentDirectory();
 
-            string path = Path.Combine(outputDir, baseName + ".cs");
-            StreamWriter writer = new StreamWriter(path);
+        DefineAst(outputDir, "Expr", new List<string>
+        {
+            "Binary   : Expr left, Token oprtr, Expr right",
+            "Grouping : Expr expression",
+            "Literal  : object value",
+            "Unary    : Token oprtr, Expr right"
+        });
+    }
 
-            // Write the necessary using directives and namespace declaration to the output file
+    private static void DefineAst(string outputDir, string baseName, List<string> types)
+    {
+        string path = Path.Combine(outputDir, baseName + ".cs");
+        using StreamWriter writer = new StreamWriter(path);
 
-            writer.WriteLine("namespace Kabuk {");
-            writer.WriteLine();
-            writer.WriteLine("internal class " + baseName + "{");
+        writer.WriteLine("namespace Kabuk;");
+        writer.WriteLine();
+        writer.WriteLine("internal abstract class " + baseName);
+        writer.WriteLine("{");
 
-            foreach (string type in types) { 
+        DefineVisitor(writer, baseName, types);
+
+        // The AST classes.
+        foreach (string type in types)
+        {
             string className = type.Split(':')[0].Trim();
-                string fields = type.Split(':')[1].Trim();
-                defineType(writer, baseName, className, fields);
-
-            }
-
-            writer.WriteLine("}");
-            writer.WriteLine("}");
-            writer.Close();
+            string fields = type.Split(':')[1].Trim();
+            DefineType(writer, baseName, className, fields);
         }
 
-        private static void defineType(StreamWriter writer, string baseName, string className, string fieldList)
+        // The base Accept() method.
+        writer.WriteLine();
+        writer.WriteLine("    internal abstract R Accept<R>(IVisitor<R> visitor);");
+
+        writer.WriteLine("}");
+    }
+
+    private static void DefineVisitor(StreamWriter writer, string baseName, List<string> types)
+    {
+        writer.WriteLine("    internal interface IVisitor<R>");
+        writer.WriteLine("    {");
+
+        foreach (string type in types)
         {
-            writer.WriteLine("internal class " + className + " : " + baseName + " {");
-            // Split the field list into individual fields
-
-            writer.WriteLine("    " + className + "(" + fieldList + ") {");
-            // Split the field list into individual fields
-
-            string[] fields = fieldList.Split(", ");
-            foreach (string field in fields) { 
-            string name = field.Split(" ")[1];
-                writer.WriteLine("      this." + name + " = " + name + ";");
-
-            }
-
-            writer.WriteLine("    }");
-
-
-
-
-            // fields
-            writer.WriteLine();
-            foreach (string field in fields) {
-                writer.WriteLine("    public " + field + ";");
-            
-            }
-            writer.WriteLine("  }");
-
+            string typeName = type.Split(':')[0].Trim();
+            writer.WriteLine("        R Visit" + typeName + baseName + "(" + typeName + " " + baseName.ToLower() + ");");
         }
 
-        private static void defineVisitor(StreamWriter writer, string baseName, List<string> types)
+        writer.WriteLine("    }");
+    }
+
+    private static void DefineType(StreamWriter writer, string baseName, string className, string fieldList)
+    {
+        writer.WriteLine();
+        writer.WriteLine("    internal class " + className + " : " + baseName);
+        writer.WriteLine("    {");
+
+        // Constructor.
+        writer.WriteLine("        internal " + className + "(" + fieldList + ")");
+        writer.WriteLine("        {");
+
+        // Store parameters in fields.
+        string[] fields = fieldList.Split(", ");
+        foreach (string field in fields)
         {
-            // Define the Visitor interface for the AST classes
-
-            writer.WriteLine("  internal interface Visitor<R> {");
-            foreach (string type in types)
-            {
-                string typeName = type.Split(':')[0].Trim();
-                writer.WriteLine("    R visit" + typeName + baseName + "(" + typeName + " " + baseName.ToLower() + ");");
-            }
-            writer.WriteLine("  }");
+            string name = field.Split(' ')[1];
+            writer.WriteLine("            this." + name + " = " + name + ";");
         }
 
+        writer.WriteLine("        }");
 
+        // Visitor pattern.
+        writer.WriteLine();
+        writer.WriteLine("        internal override R Accept<R>(IVisitor<R> visitor)");
+        writer.WriteLine("        {");
+        writer.WriteLine("            return visitor.Visit" + className + baseName + "(this);");
+        writer.WriteLine("        }");
 
+        // Fields.
+        writer.WriteLine();
+        foreach (string field in fields)
+        {
+            writer.WriteLine("        internal readonly " + field + ";");
+        }
+
+        writer.WriteLine("    }");
     }
 }

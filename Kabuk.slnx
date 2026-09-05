@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="../GenerateAST/GenerateAST.csproj" Id="8263580e-b4d2-4739-8651-7a36af985113" />
+  <Project Path="GenerateAST/GenerateAST.csproj" />
   <Project Path="SRC/Kabuk.csproj" />
 </Solution>

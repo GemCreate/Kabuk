@@ -15,7 +15,7 @@ namespace Kabuk
         private int line = 1;
 
 
-        private List<Token> tokens = new List<Token>();   // List to hold the tokens generated during scanning
+        private readonly List<Token> tokens = new List<Token>();   // List to hold the tokens generated during scanning
 
 
         // Check if the scanner has reached the end of the source code
@@ -25,7 +25,7 @@ namespace Kabuk
             return current >= Source.Length;
         }
 
-        string Source; // The source code to be scanned
+        readonly string Source; // The source code to be scanned
 
         private char peek()
         {
@@ -122,7 +122,7 @@ namespace Kabuk
                     }
                     else
                     {
-                        Interpreter.Error(line, "Beklenmedik karakter.");
+                        Program.Error(line, "Beklenmedik karakter.");
                         // If the character doesn't match any known token, report an error
                     }
                     break;
@@ -182,7 +182,7 @@ namespace Kabuk
                 }
 
             if (isAtEnd()) {
-             Interpreter.Error(line, "Sonlandırılmamış ip.");
+                Program.Error(line, "Sonlandırılmamış ip.");
              return;
              }
 

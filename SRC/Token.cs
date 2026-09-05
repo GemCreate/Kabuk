@@ -6,10 +6,10 @@ namespace Kabuk
 {
     internal class Token
     {
-         TokenType type; // The type of the token
-        string lexeme; // The actual string representation of the token
-        object literal; // The literal value associated with the token (if any)
-        int line; // The line number where the token was found
+     readonly public   TokenType type; // The type of the token
+        readonly public string lexeme; // The actual string representation of the token
+        readonly public object literal; // The literal value associated with the token (if any)
+        readonly public int line; // The line number where the token was found
 
         public Token(TokenType type, string lexeme, object literal, int line)
         {

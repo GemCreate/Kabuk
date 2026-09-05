@@ -1,0 +1,15 @@
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\bin\Debug\net10.0\GenerateAST.exe
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\bin\Debug\net10.0\GenerateAST.deps.json
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\bin\Debug\net10.0\GenerateAST.runtimeconfig.json
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\bin\Debug\net10.0\GenerateAST.dll
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\bin\Debug\net10.0\GenerateAST.pdb
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.AssemblyInfoInputs.cache
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.AssemblyInfo.cs
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.csproj.CoreCompileInputs.cache
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.sourcelink.json
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.dll
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\refint\GenerateAST.dll
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.pdb
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\GenerateAST.genruntimeconfig.cache
+C:\Users\cozor\source\repos\Kabuk\GenerateAST\obj\Debug\net10.0\ref\GenerateAST.dll
