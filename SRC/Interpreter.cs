@@ -1,13 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
+
 namespace Kabuk
 {
-    internal class Interpreter : Expr.IVisitor<object>
+    internal class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor
     {
+        public object VisitAssignExpr(Expr.Assign expr)
+        {
+            object value = evaluate(expr.value);
+            environment.Assign(expr.name, value);
+            return value;
+        }
 
+        private Env environment = new Env();
+
+        public void VisitVarStmt(Stmt.Var stmt)
+        {
+            object value = null;
+            if (stmt.Initializer != null)
+            {
+                value = evaluate(stmt.Initializer);
+            }
+
+            environment.Define(stmt.Name.lexeme, value);
+        
+        }
+
+        public object VisitVariableExpr(Expr.Variable expr)
+        {
+            return environment.get(expr.name);
+        }
+
+        public void VisitExpressionStmt(Stmt.Expression stmt)
+        {
+            evaluate(stmt.Expr);
+       
+        }
+
+        public void VisitPrintStmt(Stmt.Print stmt)
+        {
+            object value = evaluate(stmt.Expression);
+            Console.WriteLine(stringify(value));
+
+        }
 
         public object VisitLiteralExpr(Expr.Literal expr)
         {
@@ -114,31 +153,34 @@ namespace Kabuk
             if (operand is double) return;
             throw new RuntimeError(oprtr, "İşlenen bir sayı olmalıdır. ");
         }
-        public void Interpret(Expr expression)
+        public void Interpret(List<Stmt> statements)
         {
             try
             {
-                object value = evaluate(expression);
-                Console.WriteLine(stringify(value));
+                foreach (Stmt statement in statements)
+                {
+                    execute(statement);
+                }
             }
             catch (RuntimeError error)
             {
                 Program.runtimeError(error);
             }
         }
+        private void execute(Stmt stmt)
+        {
+            stmt.Accept(this);
+        }
+
+
 
         private string stringify(object obj)
         {
-            if (obj == null) return "nil";
+            if (obj == null) return "yok";
 
-            if (obj is double) {
-                string text = obj.ToString();
-                if (text.EndsWith(".0"))
-                {
-                    text = text.Substring(0, text.Length - 2);
-                }
-                return text;
-            }
+            if (obj is bool b) return b ? "doğru" : "yanlış";
+
+            if (obj is double d) return d.ToString(CultureInfo.InvariantCulture);
 
             return obj.ToString();
         }

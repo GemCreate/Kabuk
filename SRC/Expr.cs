@@ -4,10 +4,29 @@ internal abstract class Expr
 {
     internal interface IVisitor<R>
     {
+        R VisitAssignExpr(Assign expr);
         R VisitBinaryExpr(Binary expr);
         R VisitGroupingExpr(Grouping expr);
         R VisitLiteralExpr(Literal expr);
         R VisitUnaryExpr(Unary expr);
+        R VisitVariableExpr(Variable expr);
+    }
+
+    internal class Assign : Expr
+    {
+        internal Assign(Token name, Expr value)
+        {
+            this.name = name;
+            this.value = value;
+        }
+
+        internal override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitAssignExpr(this);
+        }
+
+        internal readonly Token name;
+        internal readonly Expr value;
     }
 
     internal class Binary : Expr
@@ -74,6 +93,21 @@ internal abstract class Expr
 
         internal readonly Token oprtr;
         internal readonly Expr right;
+    }
+
+    internal class Variable : Expr
+    {
+        internal Variable(Token name)
+        {
+            this.name = name;
+        }
+
+        internal override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitVariableExpr(this);
+        }
+
+        internal readonly Token name;
     }
 
     internal abstract R Accept<R>(IVisitor<R> visitor);

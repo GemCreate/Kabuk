@@ -20,6 +20,8 @@
 
 
 
+using System.Text;
+
 namespace Kabuk
 {
     internal class Program
@@ -33,6 +35,7 @@ namespace Kabuk
         // Entry point of the application
         static void Main(string[] args)
         {
+            Console.OutputEncoding = Encoding.UTF8;
 
             Console.WriteLine("Kabuk s1.0.0");
 
@@ -79,16 +82,21 @@ namespace Kabuk
             Scanner scanner = new Scanner(code); // Create a new Scanner instance with the provided code
             List<Token> tokens = scanner.ScanTokens(); // Scan the code and get the list of tokens
 
-            Parser parser = new Parser(tokens);
-            Expr expression = parser.parse();
 
+
+            //TEMP DEBUGGING: 
+            //foreach (var token in tokens)
+            //    Console.WriteLine($"{token.type} '{token.lexeme}'");
+
+            Parser parser = new Parser(tokens);
+             List<Stmt> statements = parser.Parse();
             // Stop if there was a syntax error.
             if (hadError) return;
 
-            interpreter.Interpret(expression);
+            interpreter.Interpret(statements);
 
-            Console.WriteLine(new AstPrinter().Print(expression));
 
+            Console.WriteLine($"\nhadError={hadError}, statements={statements.Count}");
             if (hadError) Environment.Exit(65);
             hadError = false;
             if (hadRuntimeError) Environment.Exit(70);

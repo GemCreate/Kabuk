@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq.Expressions;
 using System.Text;
+using static Kabuk.Expr;
+using static Kabuk.Stmt;
 
 
 namespace Kabuk
@@ -15,10 +17,29 @@ namespace Kabuk
         private Expr expression()
         {
 
-            return equality();
+            return assignment();
 
         }
 
+        private Expr assignment()
+        {
+            Expr expr = equality();
+
+            if (match(TokenType.EQUAL))
+            {
+                Token equals = previous();
+                Expr value = assignment();
+
+                if (expr is Expr.Variable) {
+                    Token name = ((Expr.Variable)expr).name;
+                    return new Expr.Assign(name, value);
+                }
+
+                error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
+        }
         private Expr equality()
         {
             Expr expr = comparison();
@@ -137,7 +158,10 @@ namespace Kabuk
             {
                 return new Expr.Literal(previous().literal);
             }
-
+            else if (match(TokenType.IDENTIFIER))
+            {
+                return new Expr.Variable(previous());
+            }
             else if (match(TokenType.LEFT_PAREN))
             {
                 Expr expr = expression();
@@ -175,7 +199,7 @@ namespace Kabuk
             }
             else
             {
-                Program.Error(token.line, " burada -> '" + token.lexeme + "'" + message);
+                Program.Error(token.line, " burada -> '" + token.lexeme + "' " + message);
             }
         }
 
@@ -204,17 +228,66 @@ namespace Kabuk
             }
         }
 
-        public Expr parse()
+       public List<Stmt> Parse()
+        {
+            List<Stmt> statements = new List<Stmt>();
+            while (!isAtEnd())
+            {
+                statements.Add(declaration());
+            }
+
+            return statements;
+        }
+        private Stmt declaration()
         {
             try
             {
-                return expression();
+                if (match(TokenType.VAR)) return varDeclaration();
+
+                return statement();
             }
             catch (ParseError error)
             {
+                synchronize();
                 return null;
             }
         }
+
+        private Stmt varDeclaration()
+        {
+            Token name = consume(TokenType.IDENTIFIER, "Değişken adı bekleniyor.");
+
+            Expr initializer = null;
+            if (match(TokenType.EQUAL))
+            {
+                initializer = expression();
+            }
+
+            consume(TokenType.SEMICOLON, "Değişken bildiriminden sonra ';' bekleniyor.");
+            return new Stmt.Var(name, initializer);
+        }
+
+        private Stmt statement()
+        {
+            if (match(TokenType.PRINT)) return printStatement();
+
+            return expressionStatement();
+        }
+
+        private Stmt expressionStatement()
+        {
+            Expr expr = expression();
+            consume(TokenType.SEMICOLON, "İfadeden sonra ';' bekleniyor.");
+            return new Stmt.Expression(expr);
+        }
+        private Stmt printStatement()
+        {
+            Expr value = expression();
+            consume(TokenType.SEMICOLON, "Değerden sonra ';' bekleniyor.");
+            return new Stmt.Print(value);
+        }
+
+
 
 
         //private Expression Equality()

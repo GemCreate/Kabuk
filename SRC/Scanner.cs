@@ -35,7 +35,9 @@ namespace Kabuk
         }
 
         public Scanner(string source) {
-            Source = source;
+            this.Source = source.IsNormalized()
+       ? source
+       : source.Normalize();
             // Initialize the scanner with the provided source code
         }
 
@@ -128,11 +130,16 @@ namespace Kabuk
                     break;
 
             }
+
+
+          
         }
+        private const string TurkishLetters = "çÇğĞıİöÖşŞüÜ";
         private bool isAlpha(char c)
         {
             return (c >= 'a' && c <= 'z') ||
                    (c >= 'A' && c <= 'Z') ||
+                   TurkishLetters.Contains(c) ||
                     c == '_';
         }
 
@@ -144,8 +151,10 @@ namespace Kabuk
         private void identifier()
         {
             while (isAlphaNumeric(peek())) advance();
-
-            addToken(TokenType.IDENTIFIER);
+            string value = Source[(start + 1)..(current - 1)];
+    
+            TokenType type = keywords.GetValueOrDefault(value, TokenType.IDENTIFIER);
+            addToken(type);
         }
         private char peekNext()
         {
@@ -167,7 +176,7 @@ namespace Kabuk
             }
 
             addToken(TokenType.NUMBER,
-                Double.Parse(Source[start..current]));
+                double.Parse(Source[start..current]));
         }
 
         private bool isDigit(char c)
@@ -218,10 +227,10 @@ namespace Kabuk
             tokens.Add(new Token(type, text, literal, line));
         }
 
-        private static Dictionary<string, TokenType> keywords()
+        private static readonly Dictionary<string, TokenType> keywords = new()
         {
-            return new Dictionary<string, TokenType>
-            {
+
+
                 { "ve", TokenType.AND },
                 { "sınıf", TokenType.CLASS },
                 { "yoksa", TokenType.ELSE },
@@ -230,7 +239,7 @@ namespace Kabuk
                 { "fonksiyon", TokenType.FUN },
                 { "eğer", TokenType.IF },
                 { "yok", TokenType.NIL },
-                { "ya da", TokenType.OR },
+                { "veya", TokenType.OR },
                 { "yaz", TokenType.PRINT },
                 { "ver", TokenType.RETURN },
                 { "süper", TokenType.SUPER },
@@ -238,8 +247,8 @@ namespace Kabuk
                 { "doğru", TokenType.TRUE },
                 { "değisken", TokenType.VAR },
                 { "olurken", TokenType.WHILE }
-            };
-        }
+
+        };
 
         
 

@@ -1,6 +1,8 @@
 ﻿// AST generation tool for the Kabuk programming language.
 // This tool generates the abstract syntax tree (AST) classes based on the provided definitions.
 
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace GenerateAST;
 
 internal class Program
@@ -18,12 +20,22 @@ internal class Program
 
         DefineAst(outputDir, "Expr", new List<string>
         {
+            "Assign   : Token name, Expr value",
             "Binary   : Expr left, Token oprtr, Expr right",
             "Grouping : Expr expression",
             "Literal  : object value",
-            "Unary    : Token oprtr, Expr right"
+            "Unary    : Token oprtr, Expr right",
+            "Variable : Token name"
         });
+
+        //DefineAst(outputDir, "Stmt", new List<string> {
+        // "Expression : Expr expression",
+        // "Print      : Expr expression"
+        //});
+        // Doesn't work with C#
     }
+
+
 
     private static void DefineAst(string outputDir, string baseName, List<string> types)
     {
