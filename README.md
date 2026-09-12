@@ -1,4 +1,8 @@
-﻿Kabuk a Turkish programming language
+
+ # MOVED TO https://www.cem.pp.ua/akumarin/Kabuk
+ 
+ 
+ Kabuk a Turkish programming language
 
 https://kabuk.cem.pp.ua/ | https://kabuk.akumarin-projects.pp.ua/
  
